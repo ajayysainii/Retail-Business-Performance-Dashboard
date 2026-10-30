@@ -1,0 +1,52 @@
+/* ====================================================================
+   DAX MEASURES CATALOG - RETAIL BUSINESS PERFORMANCE COCKPIT
+   Platform: Microsoft Power BI Desktop
+   Author: Ajay Saini
+==================================================================== */
+
+// 1. Total Sales Revenue
+Total Sales = 
+SUM(Retail_Transactions[Sales])
+
+// 2. Total Profit
+Total Profit = 
+SUM(Retail_Transactions[Profit])
+
+// 3. Overall Profit Margin %
+Profit Margin % = 
+DIVIDE([Total Profit], [Total Sales], 0)
+
+// 4. Total Orders
+Total Orders = 
+DISTINCTCOUNT(Retail_Transactions[Order_ID])
+
+// 5. Total Customers
+Total Customers = 
+DISTINCTCOUNT(Retail_Transactions[Customer_ID])
+
+// 6. Average Order Value (AOV)
+Average Order Value = 
+DIVIDE([Total Sales], [Total Orders], 0)
+
+// 7. Quantity Sold
+Total Units Sold = 
+SUM(Retail_Transactions[Quantity])
+
+// 8. Profit Status Indicator (Dynamic Formatting)
+Profit Status = 
+IF([Profit Margin %] >= 0.15, "High Margin (>15%)", 
+   IF([Profit Margin %] >= 0, "Healthy Margin (0-15%)", "Unprofitable / Loss Erosion"))
+
+// 9. Sales Previous Year (YoY Time Intelligence)
+Sales LY = 
+CALCULATE([Total Sales], SAMEPERIODLASTYEAR('Calendar'[Date]))
+
+// 10. YoY Sales Growth %
+YoY Sales Growth % = 
+VAR SalesGrowth = [Total Sales] - [Sales LY]
+RETURN
+DIVIDE(SalesGrowth, [Sales LY], 0)
+
+// 11. Regional Sales Contribution %
+Regional Contribution % = 
+DIVIDE([Total Sales], CALCULATE([Total Sales], ALL(Retail_Transactions[Region])), 0)
